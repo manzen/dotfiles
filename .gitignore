@@ -1,4 +1,8 @@
+*~
 .DS_Store
 .idea/
 *.iml
-
+.direnv/
+.env
+.env.*
+.envrc

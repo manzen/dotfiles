@@ -1,116 +1,72 @@
-# If you come from bash you might have to change your $PATH.
-export PATH="/usr/local/bin:$PATH"
-fpath=($(brew --prefix)/share/zsh/site-functions $fpath)
+### Added by Zinit's installer
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
 
-autoload -U compinit
-compinit -u
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit's installer chunk
 
-alias be="bundle exec"
+### Zinit plugins
+# Load the pure theme, with zsh-async library that's bundled with it.
+zinit ice pick"async.zsh" src"pure.zsh"
+zinit light sindresorhus/pure
 
-# Path to your oh-my-zsh installation.
-export ZSH=/Users/endo-yuta/.oh-my-zsh
+# シンタックスハイライト
+zinit light zsh-users/zsh-syntax-highlighting
 
-# Set name of the theme to load. Optionally, if you set this to "random"
-# it'll load a random theme each time that oh-my-zsh is loaded.
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="robbyrussell"
+# 入力補完
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-completions
 
-# Set list of themes to load
-# Setting this variable when ZSH_THEME=random
-# cause zsh load theme from this variable instead of
-# looking in ~/.oh-my-zsh/themes/
-# An empty array have no effect
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+# コマンド履歴を検索
+zinit light zdharma/history-search-multi-word
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+### completion
+# 補完機能を有効にする
+autoload -Uz compinit && compinit
 
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+# 小文字でも大文字にマッチ
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
+# 補完候補をTabや矢印で選択可能
+zstyle ':completion:*:default' menu select=1
 
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  git
-)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
+# 上矢印で入力中の単語にマッチした履歴を出してくれるやつ
+# ref. https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/key-bindings.zsh
 #
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# Make sure that the terminal is in application mode when zle is active, since
+# only then values from $terminfo are valid
+if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
+  function zle-line-init() {
+    echoti smkx
+  }
+  function zle-line-finish() {
+    echoti rmkx
+  }
+  zle -N zle-line-init
+  zle -N zle-line-finish
+fi
+# Start typing + [Up-Arrow] - fuzzy find history forward
+if [[ -n "${terminfo[kcuu1]}" ]]; then
+  autoload -U up-line-or-beginning-search
+  zle -N up-line-or-beginning-search
 
-# Postgres
-export PGDATA='/usr/local/var/postgres'
+  bindkey -M emacs "${terminfo[kcuu1]}" up-line-or-beginning-search
+  bindkey -M viins "${terminfo[kcuu1]}" up-line-or-beginning-search
+  bindkey -M vicmd "${terminfo[kcuu1]}" up-line-or-beginning-search
+fi
+# Start typing + [Down-Arrow] - fuzzy find history backward
+if [[ -n "${terminfo[kcud1]}" ]]; then
+  autoload -U down-line-or-beginning-search
+  zle -N down-line-or-beginning-search
 
-# anyenv
-eval "$(anyenv init - zsh)"
-
-#direnv
-eval "$(direnv hook zsh)"
-
-export PATH=/usr/local/share/npm/bin:$PATH
-export NODE_PATH=/usr/local/lib/node_modules
-export PATH="$HOME/.anyenv/bin:$PATH"
-
-export PATH="/usr/local/sbin:$PATH"
-alias brew='PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin brew'
+  bindkey -M emacs "${terminfo[kcud1]}" down-line-or-beginning-search
+  bindkey -M viins "${terminfo[kcud1]}" down-line-or-beginning-search
+  bindkey -M vicmd "${terminfo[kcud1]}" down-line-or-beginning-search
+fi

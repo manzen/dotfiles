@@ -1,3 +1,4 @@
+brew "anyenv"
 brew "awscli"
 brew "git"
 brew "direnv"

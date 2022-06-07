@@ -37,7 +37,7 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 # 補完候補をTabや矢印で選択可能
 zstyle ':completion:*:default' menu select=1
 
-# 上矢印で入力中の単語にマッチした履歴を出してくれるやつ
+### 上矢印で入力中の単語にマッチした履歴を出してくれるやつ
 # ref. https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/key-bindings.zsh
 #
 # Make sure that the terminal is in application mode when zle is active, since
@@ -70,3 +70,6 @@ if [[ -n "${terminfo[kcud1]}" ]]; then
   bindkey -M viins "${terminfo[kcud1]}" down-line-or-beginning-search
   bindkey -M vicmd "${terminfo[kcud1]}" down-line-or-beginning-search
 fi
+
+### environment variable
+export EDITOR='vim'

@@ -73,3 +73,6 @@ fi
 
 ### environment variable
 export EDITOR='vim'
+
+### direnv
+eval "$(direnv hook zsh)"

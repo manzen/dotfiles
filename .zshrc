@@ -24,6 +24,9 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-completions
 
+# peco
+zinit light mollifier/anyframe
+
 # コマンド履歴を検索
 zinit light zdharma/history-search-multi-word
 

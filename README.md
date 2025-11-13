@@ -6,10 +6,10 @@
 
 ~/.sshに以下のファイルを配置
 
-config
-github_id_rsa
-github_id_rsa.pub
-known_hosts
+* config
+* github_id_rsa
+* github_id_rsa.pub
+* known_hosts
 
 以下コマンドで確認
 

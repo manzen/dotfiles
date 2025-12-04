@@ -79,3 +79,7 @@ export EDITOR='vim'
 
 ### direnv
 eval "$(direnv hook zsh)"
+
+### anyenv
+eval "$(anyenv init -)"
+eval "$(nodenv init -)"
